@@ -6,16 +6,16 @@ const BRANCO: Color = Color { r: 0.93, g: 0.93, b: 0.93, a: 1.0 };
 
 pub struct Tabuleiro {
     textura: Texture2D,
-    branca: Texture2D,
-    preta: Texture2D,
+    pedra: Texture2D,
+    dama: Texture2D,
 }
 
 impl Tabuleiro {
     pub async fn new() -> Tabuleiro {
         Tabuleiro {
             textura: load_texture("assets\\tabuleiro.png").await.unwrap(),
-            branca: load_texture("assets\\pedra_branca.png").await.unwrap(),
-            preta: load_texture("assets\\pedra_preta.png").await.unwrap(),
+            pedra: load_texture("assets\\pedra.png").await.unwrap(),
+            dama: load_texture("assets\\dama.png").await.unwrap(),
         }
     }
 
@@ -49,12 +49,12 @@ impl Tabuleiro {
                 if casa.é_vazia() {
                     continue;
                 }
-                let peça = casa.peça().unwrap();
+                let pedra = casa.peça().unwrap();
                 draw_texture_ex(
-                    self.branca,
+                    if pedra.é_dama() { self.dama } else { self.pedra },
                     x as f32 * width + offset_h,
                     y as f32 * height + offset_v,
-                    if peça.é_preta() { PRETO } else { BRANCO },
+                    if pedra.é_preta() { PRETO } else { BRANCO },
                     DrawTextureParams {
                         dest_size: Some(vec2(width, height)),
                         ..Default::default()
