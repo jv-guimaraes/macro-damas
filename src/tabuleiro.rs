@@ -1,6 +1,9 @@
 use damas::Casa;
 use macroquad::prelude::*;
 
+const PRETO: Color = Color { r: 1.0, g: 0.0, b: 0.0, a: 0.75 };
+const BRANCO: Color = Color { r: 0.93, g: 0.93, b: 0.93, a: 1.0 };
+
 pub struct Tabuleiro {
     textura: Texture2D,
     branca: Texture2D,
@@ -48,10 +51,10 @@ impl Tabuleiro {
                 }
                 let peça = casa.peça().unwrap();
                 draw_texture_ex(
-                    if peça.é_preta() { self.preta } else { self.branca },
+                    self.branca,
                     x as f32 * width + offset_h,
                     y as f32 * height + offset_v,
-                    WHITE,
+                    if peça.é_preta() { PRETO } else { BRANCO },
                     DrawTextureParams {
                         dest_size: Some(vec2(width, height)),
                         ..Default::default()
