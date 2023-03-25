@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 macroquad = "0.3.25"
 damas = { path = "../damas" }
+itertools = "0.10.5"
+lazy_static = "1.4.0"
