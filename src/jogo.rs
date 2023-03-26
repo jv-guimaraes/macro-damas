@@ -7,13 +7,13 @@ use crate::util::*;
 
 const TABULEIRO: [[char; 8]; 8] = [
     ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', 'p', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', 'p', '.'],
+    ['.', '.', 'p', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', 'p', '.', '.'],
+    ['.', '.', 'p', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', 'p', '.', '.', '.'],
-    ['.', '.', '.', 'b', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', 'B', '.', '.', '.', '.', '.'],
 ];
 
 const COMPUTADOR_DELAY: f32 = 0.5;
@@ -40,16 +40,23 @@ pub struct Jogo {
     partida: Partida,
     vez: Vez,
     computador_delay: f32,
+    acabou: bool,
 }
 
 impl Jogo {
     fn draw(&self) {
         self.tabuleiro.draw(self.partida.get_tabuleiro());
-        let text = format!("Vez do {:?} {}", self.vez, posição_do_mouse_no_tabuleiro());
+        let text = if self.acabou {
+            " Game over!".to_owned()
+        } else {
+            format!(" Vez do {:?} {}", self.vez, posição_do_mouse_no_tabuleiro())
+        };
         draw_text(&text, 10.0, 15.0, 20.0, BLACK);
     }
 
     fn update(&mut self) {
+        if self.acabou { return; };
+
         if matches!(self.vez, Vez::Computador) {
             if self.computador_delay > 0.0 {
                 self.computador_delay -= get_frame_time();
@@ -57,7 +64,10 @@ impl Jogo {
             }
             let jogadas = self.partida.todas_jogadas_possiveis();
             let jogada = rand() as usize % jogadas.len();
-            self.partida.jogar(jogada);
+            if matches!(self.partida.jogar(jogada), damas::Resultado::FimDoJogo(_)) {
+                self.acabou = true;
+                return; 
+            }
             self.vez.passar();
             self.computador_delay = COMPUTADOR_DELAY;
             self.tabuleiro.ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
@@ -68,20 +78,24 @@ impl Jogo {
             if self.tabuleiro.há_pedra_selecionada() {
                 let mut jogada = None;
                 for (i, jogadas) in self.partida.todas_jogadas_possiveis().iter().enumerate() {
-                    let coord = jogadas[0].destino();
-                    let mouse = posição_do_mouse_no_tabuleiro();
-                    if cmp_coord_uvec(coord, mouse)
-                        && cmp_coord_uvec(jogadas[0].origem(), self.tabuleiro.pedra_selecionada().unwrap())
-                    {
-                        jogada = Some(i);
-                        break;
+                    for coord in jogadas.iter().map(|x| x.destino()) {
+                        let mouse = posição_do_mouse_no_tabuleiro();
+                        if cmp_coord_uvec(coord, mouse)
+                            && cmp_coord_uvec(jogadas[0].origem(), self.tabuleiro.pedra_selecionada().unwrap())
+                        {
+                            jogada = Some(i);
+                            break;
+                        }
                     }
                 }
                 if let Some(jogada_ix) = jogada {
-                    self.partida.jogar(jogada_ix);
                     self.tabuleiro.deselecionar_pedra();
                     self.tabuleiro.ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
                     self.vez.passar();
+                    if matches!(self.partida.jogar(jogada_ix), damas::Resultado::FimDoJogo(_)) {
+                        self.acabou = true;
+                        return; 
+                    }
                 }
             } else {
                 for jogadas in self.partida.todas_jogadas_possiveis() {
@@ -115,6 +129,7 @@ pub async fn new_jogo() -> Jogo {
         partida: damas::Partida::new(TABULEIRO),
         vez: Vez::Humano,
         computador_delay: COMPUTADOR_DELAY,
+        acabou: false,
     };
     jogo.tabuleiro.ativar_highlights_brancos(jogo.partida.todas_jogadas_possiveis());
     jogo
