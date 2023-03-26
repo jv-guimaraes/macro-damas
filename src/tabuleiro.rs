@@ -154,7 +154,7 @@ impl Tabuleiro {
                         pos_y,
                         tamanho.x,
                         tamanho.y,
-                        Color::new(1.0, 1.0, 1.0, 0.15),
+                        Color::new(1.0, 1.0, 1.0, 0.2),
                     ),
                     Highlight::Verde => draw_rectangle(
                         pos_x,
