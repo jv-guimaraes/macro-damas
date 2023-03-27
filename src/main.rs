@@ -1,12 +1,10 @@
-#![allow(unused)]
+// #![allow(unused)]
 
-use damas::Partida;
-use macroquad::{prelude::*, rand::rand};
+use macroquad::{prelude::*};
 
 mod tabuleiro;
 mod util;
 mod jogo;
-use jogo::Jogo;
 
 fn window_conf() -> Conf {
     Conf {

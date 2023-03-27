@@ -6,19 +6,17 @@ use crate::tabuleiro::Tabuleiro;
 use crate::util::*;
 
 const TABULEIRO: [[char; 8]; 8] = [
+    ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],
+    ['p', '.', 'p', '.', 'p', '.', 'p', '.'],
+    ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', 'p', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', 'p', '.', '.'],
-    ['.', '.', 'p', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', 'p', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', 'B', '.', '.', '.', '.', '.'],
+    ['b', '.', 'b', '.', 'b', '.', 'b', '.'],
+    ['.', 'b', '.', 'b', '.', 'b', '.', 'b'],
+    ['b', '.', 'b', '.', 'b', '.', 'b', '.'],
 ];
 
 const COMPUTADOR_DELAY: f32 = 0.5;
-
-
 
 #[derive(Debug, Clone, Copy)]
 enum Vez {
@@ -55,7 +53,9 @@ impl Jogo {
     }
 
     fn update(&mut self) {
-        if self.acabou { return; };
+        if self.acabou {
+            return;
+        };
 
         if matches!(self.vez, Vez::Computador) {
             if self.computador_delay > 0.0 {
@@ -66,14 +66,15 @@ impl Jogo {
             let jogada = rand() as usize % jogadas.len();
             if matches!(self.partida.jogar(jogada), damas::Resultado::FimDoJogo(_)) {
                 self.acabou = true;
-                return; 
+                return;
             }
             self.vez.passar();
             self.computador_delay = COMPUTADOR_DELAY;
-            self.tabuleiro.ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
+            self.tabuleiro
+                .ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
             return;
         }
-    
+
         if is_mouse_button_released(MouseButton::Left) {
             if self.tabuleiro.há_pedra_selecionada() {
                 let mut jogada = None;
@@ -81,7 +82,10 @@ impl Jogo {
                     for coord in jogadas.iter().map(|x| x.destino()) {
                         let mouse = posição_do_mouse_no_tabuleiro();
                         if cmp_coord_uvec(coord, mouse)
-                            && cmp_coord_uvec(jogadas[0].origem(), self.tabuleiro.pedra_selecionada().unwrap())
+                            && cmp_coord_uvec(
+                                jogadas[0].origem(),
+                                self.tabuleiro.pedra_selecionada().unwrap(),
+                            )
                         {
                             jogada = Some(i);
                             break;
@@ -90,26 +94,31 @@ impl Jogo {
                 }
                 if let Some(jogada_ix) = jogada {
                     self.tabuleiro.deselecionar_pedra();
-                    self.tabuleiro.ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
+                    self.tabuleiro
+                        .ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
                     self.vez.passar();
-                    if matches!(self.partida.jogar(jogada_ix), damas::Resultado::FimDoJogo(_)) {
+                    if matches!(
+                        self.partida.jogar(jogada_ix),
+                        damas::Resultado::FimDoJogo(_)
+                    ) {
                         self.acabou = true;
-                        return; 
-                    }
-                }
-            } else {
-                for jogadas in self.partida.todas_jogadas_possiveis() {
-                    let coord = jogadas[0].origem();
-                    let mouse = posição_do_mouse_no_tabuleiro();
-                    if coord.x == mouse.x as i32 && coord.y == mouse.y as i32 {
-                        self.tabuleiro
-                            .selecionar_pedra(posição_do_mouse_no_tabuleiro());
-                        self.tabuleiro.ativar_highlights_verdes(jogadas);
+                        return;
                     }
                 }
             }
+
+            self.tabuleiro.ativar_highlights_brancos(self.partida.todas_jogadas_possiveis());
+            for jogadas in self.partida.todas_jogadas_possiveis() {
+                let coord = jogadas[0].origem();
+                let mouse = posição_do_mouse_no_tabuleiro();
+                if coord.x == mouse.x as i32 && coord.y == mouse.y as i32 {
+                    self.tabuleiro
+                        .selecionar_pedra(posição_do_mouse_no_tabuleiro());
+                    self.tabuleiro.ativar_highlights_verdes(jogadas);
+                }
+            }
         }
-    
+
         if is_mouse_button_released(MouseButton::Right) {
             self.tabuleiro.deselecionar_pedra();
             self.tabuleiro
@@ -131,6 +140,7 @@ pub async fn new_jogo() -> Jogo {
         computador_delay: COMPUTADOR_DELAY,
         acabou: false,
     };
-    jogo.tabuleiro.ativar_highlights_brancos(jogo.partida.todas_jogadas_possiveis());
+    jogo.tabuleiro
+        .ativar_highlights_brancos(jogo.partida.todas_jogadas_possiveis());
     jogo
 }

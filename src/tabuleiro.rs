@@ -2,7 +2,7 @@ use damas::{Casa, Jogada};
 use macroquad::prelude::*;
 
 use crate::util::{
-    barra_horizontal, barra_vertical, posição_do_mouse_no_tabuleiro, tamanho_da_casa,
+    barra_horizontal, barra_vertical, tamanho_da_casa,
 };
 
 const PRETO: Color = Color {
@@ -35,7 +35,7 @@ pub struct Tabuleiro {
 
 impl Tabuleiro {
     pub async fn new() -> Tabuleiro {
-        let mut highlights = [[Highlight::Nenhum; 8]; 8];
+        let highlights = [[Highlight::Nenhum; 8]; 8];
         Tabuleiro {
             textura: load_texture("assets\\tabuleiro.png").await.unwrap(),
             pedra: load_texture("assets\\pedra.png").await.unwrap(),
@@ -51,10 +51,14 @@ impl Tabuleiro {
         self.desenhar_highlights();
     }
 
-    pub fn ativar_highlights_brancos(&mut self, jogadas: &Vec<Vec<Jogada>>) {
+    pub fn desativar_highlights(&mut self) {
         for h in self.highlights.iter_mut().flatten() {
             *h = Highlight::Nenhum;
         }
+    }
+
+    pub fn ativar_highlights_brancos(&mut self, jogadas: &Vec<Vec<Jogada>>) {
+        self.desativar_highlights();
         for jogada in jogadas {
             let coord = jogada[0].origem();
             self.highlights[coord.y as usize][coord.x as usize] = Highlight::Branco;
@@ -89,11 +93,6 @@ impl Tabuleiro {
         #[allow(clippy::needless_range_loop)]
         for y in 0..8 {
             for x in 0..8 {
-                if let Some(peça) = self.pedra_selecionada {
-                    if peça == uvec2(x as u32, y as u32) {
-                        continue;
-                    }
-                }
                 let casa = tabuleiro[y][x];
                 if casa.é_vazia() {
                     continue;
@@ -115,29 +114,6 @@ impl Tabuleiro {
                 );
             }
         }
-        self.desenhar_pedra_flutuante(tabuleiro);
-    }
-
-    fn desenhar_pedra_flutuante(&self, tabuleiro: &[[Casa; 8]; 8]) {
-        if matches!(self.pedra_selecionada, None) {
-            return;
-        }
-        let peça = self.pedra_selecionada.unwrap();
-        let pedra = tabuleiro[peça.y as usize][peça.x as usize].peça().unwrap();
-        draw_texture_ex(
-            if pedra.é_dama() {
-                self.dama
-            } else {
-                self.pedra
-            },
-            mouse_position().0 - tamanho_da_casa().x / 2.0,
-            mouse_position().1 - tamanho_da_casa().y / 2.0,
-            if pedra.é_preta() { PRETO } else { BRANCO },
-            DrawTextureParams {
-                dest_size: Some(vec2(tamanho_da_casa().x, tamanho_da_casa().y)),
-                ..Default::default()
-            },
-        );
     }
 
     fn desenhar_highlights(&self) {
@@ -183,5 +159,4 @@ impl Tabuleiro {
     pub fn pedra_selecionada(&self) -> Option<UVec2> {
         self.pedra_selecionada
     }
-
 }
