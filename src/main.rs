@@ -1,25 +1,23 @@
-// #![allow(unused)]
+#![allow(unused)]
+use macroquad::prelude::*;
 
-use macroquad::{prelude::*};
+mod partida;
+use partida::Partida;
 
-mod tabuleiro;
-mod util;
-mod jogo;
-
-fn window_conf() -> Conf {
-    Conf {
-        window_title: "Macro Damas".to_owned(),
-        window_width: 650,
-        window_height: 650,
+fn window_config() -> macroquad::window::Conf {
+    macroquad::window::Conf {
+        window_width: 600,
+        window_height: 600,
         ..Default::default()
     }
 }
 
-#[macroquad::main(window_conf)]
+#[macroquad::main(window_config)]
 async fn main() {
-    let mut jogo = jogo::new_jogo().await;
+    let mut tela_atual = Partida::iniciar().await;
     loop {
-        jogo.run();
+        clear_background(GRAY);
+        tela_atual.rodar();
         next_frame().await
     }
 }
