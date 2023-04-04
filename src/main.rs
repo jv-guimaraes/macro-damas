@@ -6,6 +6,7 @@ use partida::Partida;
 
 fn window_config() -> macroquad::window::Conf {
     macroquad::window::Conf {
+        window_title: "Macro Damas".to_owned(),
         window_width: 600,
         window_height: 600,
         ..Default::default()
