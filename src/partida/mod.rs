@@ -35,19 +35,13 @@ impl Partida {
 
     fn draw(&mut self) {
         self.desenhar_background();
+        self.desenhar_texto_de_debug();
         if matches!(self.estado, Estado::AnimandoJogada) {
             self.desenhar_pedras(self.animacao.as_ref().unwrap().get_estado_inicial());
             self.animacao.as_mut().unwrap().desenhar();
         } else {
             self.desenhar_pedras(self.partida.get_tabuleiro());
         }
-        draw_text(
-            &format!("{:?}", self.estado),
-            util::barra_vertical(),
-            14.0,
-            20.0,
-            BLACK,
-        );
     }
 
     fn update(&mut self) {
@@ -181,5 +175,15 @@ impl Partida {
             damas::Pedra::Preta => self.assets.preta,
             damas::Pedra::DamaPreta => self.assets.d_preta,
         }
+    }
+
+    fn desenhar_texto_de_debug(&self) {
+        draw_text(
+            &format!("{:?}", self.estado),
+            util::barra_vertical(),
+            14.0,
+            20.0,
+            BLACK,
+        );
     }
 }
