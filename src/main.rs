@@ -17,6 +17,7 @@ async fn main() {
     let mut tela_atual = Partida::iniciar().await;
     loop {
         clear_background(GRAY);
+        if is_key_down(KeyCode::Q) { std::process::exit(0) }
         tela_atual.rodar();
         next_frame().await
     }
