@@ -1,4 +1,4 @@
-use damas::Jogada;
+use damas::{Jogada, Coord};
 use macroquad::{prelude::*, rand::rand};
 
 mod animacao;
@@ -9,7 +9,7 @@ use assets::Assets;
 mod estado;
 use estado::Estado;
 
-use self::util::uvec_to_coord;
+use self::util::{uvec_to_coord, coord_para_tela, tamanho_da_casa};
 
 pub struct Partida {
     assets: Assets,
@@ -36,11 +36,16 @@ impl Partida {
     fn draw(&mut self) {
         self.desenhar_background();
         self.desenhar_texto_de_debug();
-        if matches!(self.estado, Estado::AnimandoJogada) {
-            self.desenhar_pedras(self.animacao.as_ref().unwrap().get_estado_inicial());
-            self.animacao.as_mut().unwrap().desenhar();
-        } else {
-            self.desenhar_pedras(self.partida.get_tabuleiro());
+        match self.estado {
+            Estado::AnimandoJogada => {
+                self.desenhar_pedras(self.animacao.as_ref().unwrap().get_estado_inicial());
+                self.animacao.as_mut().unwrap().desenhar();
+            }
+            Estado::PedraSelecionada(pedra) => {
+                self.desenhar_pedras(self.partida.get_tabuleiro());
+                self.desenhar_highlights_verdes();
+            }
+            _ => self.desenhar_pedras(self.partida.get_tabuleiro()),
         }
     }
 
@@ -185,5 +190,22 @@ impl Partida {
             20.0,
             BLACK,
         );
+    }
+
+    fn desenhar_highlights_verdes(&self) {
+        if let Estado::PedraSelecionada(pedra) = self.estado {
+            let jogadas = self.partida.todas_jogadas_possiveis();
+            for jogada in jogadas.iter().filter(|x| x[0].origem() == pedra) {
+                for movimento in jogada {
+                    self.desenhar_highlight(movimento.destino(), Color {r: 0.0, g: 0.89, b: 0.19, a: 0.4});
+                }
+            }
+        }
+    }
+
+    fn desenhar_highlight(&self, coord: Coord, cor: Color) {
+        let pos = coord_para_tela(coord);
+        let tamanho = tamanho_da_casa();
+        draw_rectangle(pos.x, pos.y, tamanho.x, tamanho.y, cor);
     }
 }
