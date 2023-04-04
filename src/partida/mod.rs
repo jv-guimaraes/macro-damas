@@ -20,7 +20,6 @@ pub struct Partida {
 
 impl Partida {
     pub async fn iniciar() -> Self {
-        println!("{:?}", util::tamanho_da_casa());
         Partida {
             assets: Assets::carregar().await,
             partida: damas::Partida::default(),
