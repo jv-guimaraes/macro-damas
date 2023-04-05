@@ -19,21 +19,24 @@ pub fn tamanho_da_casa() -> Vec2 {
 pub fn tabuleiro_para_tela(coord: UVec2) -> Vec2 {
     Vec2 {
         x: barra_vertical() + coord.x as f32 * tamanho_da_casa().x,
-        y: barra_horizontal() + coord.y  as f32 * tamanho_da_casa().y,
+        y: barra_horizontal() + coord.y as f32 * tamanho_da_casa().y,
     }
 }
 
 pub fn coord_para_tela(coord: damas::Coord) -> Vec2 {
     Vec2 {
         x: barra_vertical() + coord.x as f32 * tamanho_da_casa().x,
-        y: barra_horizontal() + coord.y  as f32 * tamanho_da_casa().y,
+        y: barra_horizontal() + coord.y as f32 * tamanho_da_casa().y,
     }
 }
 
 pub fn tela_para_tabuleiro(coord: Vec2) -> UVec2 {
     let x = coord.x - barra_vertical();
     let y = coord.y - barra_horizontal();
-    UVec2 { x: (x / tamanho_da_casa().x) as u32, y: (y / tamanho_da_casa().y) as u32 }
+    UVec2 {
+        x: (x / tamanho_da_casa().x) as u32,
+        y: (y / tamanho_da_casa().y) as u32,
+    }
 }
 
 pub fn mouse_para_tabuleiro() -> Option<UVec2> {

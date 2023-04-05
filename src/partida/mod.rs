@@ -203,7 +203,7 @@ impl Partida {
                 for movimento in jogada {
                     let cor = match movimento {
                         Jogada::Mover(_, _) => Color::new(0.0, 0.89, 0.19, 0.5),
-                        Jogada::Capturar(_, _, _) => Color { r: 1.0, g: 0.0, b: 0.0, a: 0.5 },
+                        Jogada::Capturar(_, _, _) => Color::new(1.0, 0.0, 0.0, 0.5),
                     };
                     self.desenhar_highlight(movimento.destino(), cor);
                 }
