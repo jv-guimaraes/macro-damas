@@ -1,15 +1,15 @@
-use damas::{Jogada, Coord};
+use damas::{Coord, Jogada};
 use macroquad::{prelude::*, rand::rand};
 
 mod animacao;
-use animacao::Animacao;
 mod assets;
-mod util;
-use assets::Assets;
 mod estado;
-use estado::Estado;
+mod util;
 
-use self::util::{uvec_to_coord, coord_para_tela, tamanho_da_casa};
+use animacao::Animacao;
+use assets::Assets;
+use estado::Estado;
+use util::{coord_para_tela, mouse_para_tabuleiro, tamanho_da_casa, uvec_to_coord};
 
 pub struct Partida {
     assets: Assets,
@@ -43,7 +43,11 @@ impl Partida {
             }
             Estado::PedraSelecionada(pedra) => {
                 self.desenhar_pedras(self.partida.get_tabuleiro());
-                self.desenhar_highlights_verdes();
+                self.desenhar_highlights_de_jogadas();
+            }
+            Estado::EsperandoJogador => {
+                self.desenhar_pedras(self.partida.get_tabuleiro());
+                self.desenhar_highlights_de_pedras();
             }
             _ => self.desenhar_pedras(self.partida.get_tabuleiro()),
         }
@@ -51,7 +55,7 @@ impl Partida {
 
     fn update(&mut self) {
         if self.estado == Estado::EsperandoJogador && is_mouse_button_released(MouseButton::Left) {
-            let pos_tabuleiro = match util::mouse_para_tabuleiro() {
+            let pos_tabuleiro = match mouse_para_tabuleiro() {
                 Some(pos) => pos,
                 None => return,
             };
@@ -65,7 +69,7 @@ impl Partida {
 
         if let Estado::PedraSelecionada(coord) = self.estado {
             if is_mouse_button_released(MouseButton::Left) {
-                let pos_tabuleiro = match util::mouse_para_tabuleiro() {
+                let pos_tabuleiro = match mouse_para_tabuleiro() {
                     Some(pos) => pos,
                     None => return,
                 };
@@ -104,7 +108,7 @@ impl Partida {
                 } else if self.partida.é_a_vez_do_branco() {
                     self.estado = Estado::EsperandoJogador;
                 } else {
-                    self.estado = Estado::EsperandoComputador(1.0);
+                    self.estado = Estado::EsperandoComputador(0.25);
                 }
                 self.animacao = None;
             }
@@ -154,7 +158,7 @@ impl Partida {
                 a: 1.0,
             },
             DrawTextureParams {
-                dest_size: Some(vec2(util::tamanho_da_casa().x, util::tamanho_da_casa().y)),
+                dest_size: Some(vec2(tamanho_da_casa().x, tamanho_da_casa().y)),
                 ..Default::default()
             },
         )
@@ -192,20 +196,34 @@ impl Partida {
         );
     }
 
-    fn desenhar_highlights_verdes(&self) {
+    fn desenhar_highlights_de_jogadas(&self) {
         if let Estado::PedraSelecionada(pedra) = self.estado {
             let jogadas = self.partida.todas_jogadas_possiveis();
             for jogada in jogadas.iter().filter(|x| x[0].origem() == pedra) {
                 for movimento in jogada {
-                    self.desenhar_highlight(movimento.destino(), Color {r: 0.0, g: 0.89, b: 0.19, a: 0.4});
+                    let cor = match movimento {
+                        Jogada::Mover(_, _) => Color::new(0.0, 0.89, 0.19, 0.5),
+                        Jogada::Capturar(_, _, _) => Color { r: 1.0, g: 0.0, b: 0.0, a: 0.5 },
+                    };
+                    self.desenhar_highlight(movimento.destino(), cor);
                 }
             }
+        }
+    }
+
+    fn desenhar_highlights_de_pedras(&self) {
+        let mut jogadas = self.partida.todas_jogadas_possiveis().clone();
+        jogadas.dedup_by_key(|x| x[0].origem());
+        for jogada in jogadas {
+            let branco = Color::new(1.0, 1.0, 1.0, 0.3);
+            self.desenhar_highlight(jogada[0].origem(), branco);
         }
     }
 
     fn desenhar_highlight(&self, coord: Coord, cor: Color) {
         let pos = coord_para_tela(coord);
         let tamanho = tamanho_da_casa();
-        draw_rectangle(pos.x, pos.y, tamanho.x, tamanho.y, cor);
+        // draw_rectangle(pos.x, pos.y, tamanho.x, tamanho.y, cor);
+        draw_rectangle_lines(pos.x, pos.y, tamanho.x, tamanho.y, 10.0, cor);
     }
 }
