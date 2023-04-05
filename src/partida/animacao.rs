@@ -2,11 +2,11 @@ use std::collections::VecDeque;
 
 use interpolation::Ease;
 use macroquad::{
-    audio::{load_sound, PlaySoundParams, Sound},
+    audio::{PlaySoundParams, Sound},
     prelude::*,
 };
 
-use super::util::{self, coord_para_tela, tamanho_da_casa};
+use super::util;
 
 pub struct Animacao {
     pub estado_inicial: [[damas::Casa; 8]; 8],
@@ -25,9 +25,6 @@ impl Animacao {
         sound: Sound,
     ) -> Self {
         let origem = jogadas[0].origem();
-        let pedra = estado_inicial[origem.y as usize][origem.x as usize]
-            .pedra()
-            .unwrap();
         let mut estado_inicial = *estado_inicial;
         estado_inicial[origem.y as usize][origem.x as usize] = damas::Casa::Vazia;
         Animacao {
@@ -43,11 +40,11 @@ impl Animacao {
     pub fn desenhar(&mut self) {
         draw_text("Animating...", screen_width() - 120.0, 15.0, 20.0, BLACK);
         let jogada = self.jogadas[0];
-        let destino = coord_para_tela(jogada.destino());
+        let destino = util::coord_para_tela(jogada.destino());
         self.pos = self
             .pos
             .lerp(destino, (self.speed * get_frame_time()).quadratic_in_out());
-        if util::vec_equals(self.pos, coord_para_tela(jogada.destino())) {
+        if util::vec2_equals(self.pos, util::coord_para_tela(jogada.destino())) {
             macroquad::audio::play_sound(self.sound, PlaySoundParams::default());
             self.jogadas.pop_front();
         }

@@ -52,7 +52,7 @@ impl Partida {
                 self.desenhar_pedras(self.animacao.as_ref().unwrap().get_estado_inicial());
                 self.animacao.as_mut().unwrap().desenhar();
             }
-            Estado::PedraSelecionada(pedra) => {
+            Estado::PedraSelecionada(_) => {
                 self.desenhar_pedras(self.partida.get_tabuleiro());
                 self.desenhar_highlights_de_jogadas();
             }
@@ -202,7 +202,7 @@ impl Partida {
             &format!("{:?}", self.estado),
             util::barra_vertical(),
             14.0,
-            20.0,
+            28.0,
             BLACK,
         );
     }
@@ -214,7 +214,7 @@ impl Partida {
                 for movimento in jogada {
                     let cor = match movimento {
                         Jogada::Mover(_, _) => Color::new(0.0, 0.89, 0.19, 0.5),
-                        Jogada::Capturar(_, _, _) => Color::new(1.0, 0.0, 0.0, 0.5),
+                        Jogada::Capturar(_, _, _) => Color::new(1.0, 0.0, 0.0, 0.6),
                     };
                     self.desenhar_highlight(movimento.destino(), cor);
                 }

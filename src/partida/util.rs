@@ -57,6 +57,6 @@ pub fn uvec_to_coord(uvec: UVec2) -> damas::Coord {
     }
 }
 
-pub fn vec_equals(first: Vec2, second: Vec2) -> bool {
+pub fn vec2_equals(first: Vec2, second: Vec2) -> bool {
     (first.x - second.x).abs() < 10.0 || (first.y - second.y).abs() < 10.0
 }
