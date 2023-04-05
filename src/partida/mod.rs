@@ -11,6 +11,17 @@ use assets::Assets;
 use estado::Estado;
 use util::{coord_para_tela, mouse_para_tabuleiro, tamanho_da_casa, uvec_to_coord};
 
+const TABULEIRO_INICIAL: [[char; 8]; 8] = [
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', 'p', '.', '.', '.', 'p', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', 'p', '.', 'p', '.', '.', '.', '.'],
+    ['.', '.', 'b', '.', '.', '.', '.', '.'],
+];
+
 pub struct Partida {
     assets: Assets,
     partida: damas::Partida,
@@ -22,7 +33,7 @@ impl Partida {
     pub async fn iniciar() -> Self {
         Partida {
             assets: Assets::carregar().await,
-            partida: damas::Partida::default(),
+            partida: damas::Partida::new(TABULEIRO_INICIAL),
             animacao: None,
             estado: Estado::EsperandoJogador,
         }
