@@ -1,4 +1,4 @@
-use damas::{Coord, Jogada};
+use damas::{Coord, Jogada, Resultado};
 use macroquad::{prelude::*, rand::rand};
 
 mod animacao;
@@ -12,14 +12,14 @@ use estado::Estado;
 use util::{coord_para_tela, mouse_para_tabuleiro, tamanho_da_casa, uvec_to_coord};
 
 const TABULEIRO_INICIAL: [[char; 8]; 8] = [
+    ['.', 'P', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', 'p', '.', '.', '.', 'p', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', 'p', '.', 'p', '.', '.', '.', '.'],
-    ['.', '.', 'b', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['B', '.', '.', '.', '.', '.', '.', '.'],
 ];
 
 pub struct Partida {
@@ -27,6 +27,7 @@ pub struct Partida {
     partida: damas::Partida,
     animacao: Option<Animacao>,
     estado: Estado,
+    _acabou: Option<Resultado>,
 }
 
 impl Partida {
@@ -36,6 +37,7 @@ impl Partida {
             partida: damas::Partida::new(TABULEIRO_INICIAL),
             animacao: None,
             estado: Estado::EsperandoJogador,
+            _acabou: None,
         }
     }
 
@@ -114,8 +116,14 @@ impl Partida {
 
         if let Estado::AnimandoJogada = self.estado {
             if self.animacao.as_ref().unwrap().acabou() {
-                if self.partida.acabou() {
-                    self.estado = Estado::FimDoJogo;
+                if self.partida.ganhou() {
+                    let ganhador = match self.animacao.as_ref().unwrap().get_pedra().é_branca() {
+                        true => "Branco",
+                        false => "Preto",
+                    };
+                    self.estado = Estado::Ganhou(ganhador.to_owned());
+                } else if self.partida.empatou() {
+                    self.estado = Estado::Empate;
                 } else if self.partida.é_a_vez_do_branco() {
                     self.estado = Estado::EsperandoJogador;
                 } else {
@@ -201,8 +209,8 @@ impl Partida {
         draw_text(
             &format!("{:?}", self.estado),
             util::barra_vertical(),
-            14.0,
-            28.0,
+            16.0,
+            27.0,
             BLACK,
         );
     }

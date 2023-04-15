@@ -15,6 +15,7 @@ pub struct Animacao {
     textura: Texture2D,
     speed: f32,
     sound: Sound,
+    pedra: damas::Pedra,
 }
 
 impl Animacao {
@@ -25,6 +26,7 @@ impl Animacao {
         sound: Sound,
     ) -> Self {
         let origem = jogadas[0].origem();
+        let pedra = estado_inicial[origem.y as usize][origem.x as usize].pedra().unwrap();
         let mut estado_inicial = *estado_inicial;
         estado_inicial[origem.y as usize][origem.x as usize] = damas::Casa::Vazia;
         Animacao {
@@ -34,6 +36,7 @@ impl Animacao {
             textura,
             speed: 20.0,
             sound,
+            pedra,
         }
     }
 
@@ -66,5 +69,9 @@ impl Animacao {
 
     pub fn get_estado_inicial(&self) -> &[[damas::Casa; 8]; 8] {
         &self.estado_inicial
+    }
+
+    pub fn get_pedra(&self) -> damas::Pedra {
+        self.pedra
     }
 }
