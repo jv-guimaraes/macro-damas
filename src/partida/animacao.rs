@@ -34,7 +34,7 @@ impl Animacao {
             jogadas: VecDeque::from(jogadas),
             pos: util::coord_para_tela(origem),
             textura,
-            speed: 20.0,
+            speed: 0.4,
             sound,
             pedra,
         }
@@ -46,7 +46,7 @@ impl Animacao {
         let destino = util::coord_para_tela(jogada.destino());
         self.pos = self
             .pos
-            .lerp(destino, (self.speed * get_frame_time()).quadratic_in_out());
+            .lerp(destino, self.speed.quadratic_in_out());
         if util::vec2_equals(self.pos, util::coord_para_tela(jogada.destino())) {
             macroquad::audio::play_sound(self.sound, PlaySoundParams::default());
             self.jogadas.pop_front();

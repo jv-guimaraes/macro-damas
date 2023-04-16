@@ -1,5 +1,5 @@
-use damas::{Coord, Jogada, Resultado};
-use macroquad::{prelude::*, rand::rand};
+use damas::{Coord, Jogada};
+use macroquad::{prelude::*};
 
 mod animacao;
 mod assets;
@@ -10,24 +10,27 @@ use animacao::Animacao;
 use assets::Assets;
 use estado::Estado;
 use util::{coord_para_tela, mouse_para_tabuleiro, tamanho_da_casa, uvec_to_coord};
+use damasminimax::melhor_jogada_preta;
 
 const TABULEIRO_INICIAL: [[char; 8]; 8] = [
-    ['.', 'P', '.', '.', '.', '.', '.', '.'],
+    ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],
+    ['p', '.', 'p', '.', 'p', '.', 'p', '.'],
+    ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.'],
-    ['B', '.', '.', '.', '.', '.', '.', '.'],
+    ['b', '.', 'b', '.', 'b', '.', 'b', '.'],
+    ['.', 'b', '.', 'b', '.', 'b', '.', 'b'],
+    ['b', '.', 'b', '.', 'b', '.', 'b', '.'],
 ];
+
+const SEARCH_DEPTH: u32 = 9;
+const BOT_DELAY: f32 = 0.15;
 
 pub struct Partida {
     assets: Assets,
     partida: damas::Partida,
     animacao: Option<Animacao>,
     estado: Estado,
-    _acabou: Option<Resultado>,
 }
 
 impl Partida {
@@ -37,7 +40,6 @@ impl Partida {
             partida: damas::Partida::new(TABULEIRO_INICIAL),
             animacao: None,
             estado: Estado::EsperandoJogador,
-            _acabou: None,
         }
     }
 
@@ -127,7 +129,7 @@ impl Partida {
                 } else if self.partida.é_a_vez_do_branco() {
                     self.estado = Estado::EsperandoJogador;
                 } else {
-                    self.estado = Estado::EsperandoComputador(0.25);
+                    self.estado = Estado::EsperandoComputador(BOT_DELAY);
                 }
                 self.animacao = None;
             }
@@ -137,7 +139,7 @@ impl Partida {
             *delay -= get_frame_time();
             if *delay <= 0.0 {
                 let jogadas = self.partida.todas_jogadas_possiveis();
-                let ix = rand() as usize % jogadas.len();
+                let ix = melhor_jogada_preta(&self.partida, SEARCH_DEPTH);
                 let textura =
                     self.pedra_to_textura(self.partida.pedra(jogadas[ix][0].origem()).unwrap());
                 self.animacao = Some(Animacao::new(
