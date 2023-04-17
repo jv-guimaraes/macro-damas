@@ -2,6 +2,6 @@
 
 members = [
     "damas",
-    "damasminimax",
+    "minimax",
     "macro-damas",
 ]

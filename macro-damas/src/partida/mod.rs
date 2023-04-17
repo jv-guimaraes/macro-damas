@@ -10,7 +10,7 @@ use animacao::Animacao;
 use assets::Assets;
 use estado::Estado;
 use util::{coord_para_tela, mouse_para_tabuleiro, tamanho_da_casa, uvec_to_coord};
-use damasminimax::melhor_jogada_preta_mt;
+use minimax::melhor_jogada_preta_mt;
 
 const TABULEIRO_INICIAL: [[char; 8]; 8] = [
     ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],

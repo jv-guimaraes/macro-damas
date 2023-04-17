@@ -7,4 +7,4 @@ edition = "2021"
 macroquad = "0.3.25"
 damas = { path = "..\\damas" }
 interpolation = "0.2.0"
-damasminimax = { path = "..\\damasminimax" }
+minimax = { path = "..\\minimax"}
