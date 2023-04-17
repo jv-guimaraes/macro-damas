@@ -10,7 +10,7 @@ use animacao::Animacao;
 use assets::Assets;
 use estado::Estado;
 use util::{coord_para_tela, mouse_para_tabuleiro, tamanho_da_casa, uvec_to_coord};
-use damasminimax::melhor_jogada_preta;
+use damasminimax::melhor_jogada_preta_mt;
 
 const TABULEIRO_INICIAL: [[char; 8]; 8] = [
     ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],
@@ -23,7 +23,7 @@ const TABULEIRO_INICIAL: [[char; 8]; 8] = [
     ['b', '.', 'b', '.', 'b', '.', 'b', '.'],
 ];
 
-const SEARCH_DEPTH: u32 = 9;
+const SEARCH_DEPTH: u32 = 8;
 const BOT_DELAY: f32 = 0.15;
 
 pub struct Partida {
@@ -139,7 +139,7 @@ impl Partida {
             *delay -= get_frame_time();
             if *delay <= 0.0 {
                 let jogadas = self.partida.todas_jogadas_possiveis();
-                let ix = melhor_jogada_preta(&self.partida, SEARCH_DEPTH);
+                let ix = melhor_jogada_preta_mt(&self.partida, SEARCH_DEPTH);
                 let textura =
                     self.pedra_to_textura(self.partida.pedra(jogadas[ix][0].origem()).unwrap());
                 self.animacao = Some(Animacao::new(
