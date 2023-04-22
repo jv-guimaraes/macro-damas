@@ -89,11 +89,12 @@ fn evaluate(position: &Partida) -> i32 {
     let mut sum = 0;
     for casa in position.get_tabuleiro().iter().flatten() {
         if let Casa::Ocupada(pedra) = casa {
-            if pedra.é_branca() {
-                sum += 1;
-            } else {
-                sum -= 1;
-            }
+            sum += match pedra {
+                damas::Pedra::Branca => 1,
+                damas::Pedra::DamaBranca => 2,
+                damas::Pedra::Preta => -1,
+                damas::Pedra::DamaPreta => -2,
+            };
         }
     }
     sum

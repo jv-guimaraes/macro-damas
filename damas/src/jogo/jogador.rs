@@ -11,4 +11,11 @@ impl Jogador {
             Jogador::Preto => false,
         }
     }
+
+    pub fn oposto(self) -> Jogador {
+        match self {
+            Jogador::Branco => Jogador::Preto,
+            Jogador::Preto => Jogador::Branco,
+        }
+    }
 }

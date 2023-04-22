@@ -16,7 +16,7 @@ impl Debug for Estado {
             Self::EsperandoJogador => write!(f, "EsperandoJogador"),
             Self::PedraSelecionada(arg0) => f.debug_tuple("PedraSelecionada").field(arg0).finish(),
             Self::AnimandoJogada => write!(f, "AnimandoJogada"),
-            Self::EsperandoComputador(arg0) => f.debug_tuple("EsperandoComputador").field(arg0).finish(),
+            Self::EsperandoComputador(_) => write!(f, "EsperandoComputador"),
             Self::Ganhou(ganhador) => write!(f, "{} ganhou!", ganhador),
             Self::Empate => write!(f, "Empate"),
         }

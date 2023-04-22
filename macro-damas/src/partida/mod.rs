@@ -124,6 +124,12 @@ impl Partida {
                         false => "Preto",
                     };
                     self.estado = Estado::Ganhou(ganhador.to_owned());
+                } else if self.partida.imobilizado() {
+                    let ganhador = match self.partida.get_vez() {
+                        damas::Jogador::Branco => "Preto",
+                        damas::Jogador::Preto => "Branco",
+                    };
+                    self.estado = Estado::Ganhou(ganhador.to_owned());
                 } else if self.partida.empatou() {
                     self.estado = Estado::Empate;
                 } else if self.partida.é_a_vez_do_branco() {

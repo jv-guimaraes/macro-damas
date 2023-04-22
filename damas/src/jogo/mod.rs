@@ -126,6 +126,13 @@ impl Partida {
         }
 
         self.passar_turno();
+
+        // Caso n tenha nenhuma jogada disponível, então o jogador oposto ganhou
+        if self.jogadas.is_empty() {
+            let ganhador = Some(self.vez.oposto());
+            return Resultado::FimDoJogo(ganhador);
+        }
+
         Resultado::Sucesso
     }
 
@@ -422,6 +429,10 @@ impl Partida {
 
     pub fn acabou(&self) -> bool {
         self.ganhou() || self.empatou()
+    }
+
+    pub fn imobilizado(&self) -> bool {
+        self.jogadas.is_empty()
     }
 }
 
