@@ -1,4 +1,4 @@
-// #![allow(unused)]
+// #![windows_subsystem = "windows"]
 use macroquad::prelude::*;
 
 mod partida;

@@ -24,7 +24,7 @@ const TABULEIRO_INICIAL: [[char; 8]; 8] = [
 ];
 
 const SEARCH_DEPTH: u32 = 8;
-const BOT_DELAY: f32 = 0.15;
+const BOT_DELAY: f32 = 0.1;
 
 pub struct Partida {
     assets: Assets,
