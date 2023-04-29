@@ -3,7 +3,7 @@ use super::coord::Coord;
 #[derive(PartialEq, Clone, Copy)]
 pub enum Jogada {
     Mover(Coord, Coord),              // (origem, destino)
-    Capturar(Coord, Coord, Coord),       // (origem, comida, destino)
+    Capturar(Coord, Coord, Coord),       // (origem, captura, destino)
 }
 
 impl std::fmt::Debug for Jogada {

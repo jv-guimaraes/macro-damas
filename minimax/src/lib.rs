@@ -9,26 +9,8 @@ pub fn melhor_jogada_preta(partida: &Partida, depth: u32) -> usize {
     if partida.get_vez().é_branco() {
         panic!("Não é a vez do preto!");
     }
-    let mut min_value = i32::MAX;
-    let mut min_ix = 0;
-    for (ix, _) in partida.todas_jogadas_possiveis().iter().enumerate() {
-        let mut copia = partida.clone();
-        copia.jogar(ix);
-        let value = minimax(&copia, depth - 1, true);
-        if value < min_value {
-            min_value = value;
-            min_ix = ix;
-        }
-    }
-    min_ix
-}
-
-pub fn melhor_jogada_preta_mt(partida: &Partida, depth: u32) -> usize {
-    if partida.get_vez().é_branco() {
-        panic!("Não é a vez do preto!");
-    }
     let mut handles = Vec::new();
-    for (ix, _) in partida.todas_jogadas_possiveis().iter().enumerate() {
+    for ix in 0..partida.todas_jogadas_possiveis().len() {
         let mut copia = partida.clone();
         copia.jogar(ix);
         handles.push(thread::spawn(move || minimax(&copia, depth - 1, true)));
@@ -58,7 +40,7 @@ fn _minimax(
     }
     if maximizing_player {
         let mut max_eval = i32::MIN;
-        for (ix, _) in partida.todas_jogadas_possiveis().iter().enumerate() {
+        for ix in 0..partida.todas_jogadas_possiveis().len() {
             let mut copia = partida.clone();
             copia.jogar(ix);
             let eval = _minimax(&copia, depth - 1, alpha, beta, false);
@@ -71,7 +53,7 @@ fn _minimax(
         max_eval
     } else {
         let mut min_eval = i32::MAX;
-        for (ix, _) in partida.todas_jogadas_possiveis().iter().enumerate() {
+        for ix in 0..partida.todas_jogadas_possiveis().len() {
             let mut copia = partida.clone();
             copia.jogar(ix);
             let eval = _minimax(&copia, depth - 1, alpha, beta, true);

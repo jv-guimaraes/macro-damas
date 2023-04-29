@@ -1,19 +1,19 @@
 use itertools::Itertools;
 use std::fmt::Display;
 
-pub mod coord;
-pub mod jogador;
 pub mod casa;
-pub mod pedra;
+pub mod coord;
 pub mod jogada;
+pub mod jogador;
+pub mod pedra;
 pub mod resultado;
 
+use self::casa::Casa;
 use self::coord::{c, Coord};
 use self::jogada::Jogada;
 use self::jogador::Jogador;
-use self::resultado::Resultado;
-use self::casa::Casa;
 use self::pedra::Pedra;
+use self::resultado::Resultado;
 
 const TABULEIRO_INICIAL_CHARS: [[char; 8]; 8] = [
     ['.', 'p', '.', 'p', '.', 'p', '.', 'p'],
@@ -189,7 +189,7 @@ impl Partida {
             Jogada::Capturar(origem, captura, destino) => {
                 self.mover_sem_checar(origem, destino);
                 *self.casa_mut(captura) = Casa::Vazia;
-            },
+            }
         }
     }
 
@@ -202,43 +202,50 @@ impl Partida {
         let mut stack: Vec<Jogada> = vec![];
         let mut sequencias: Vec<Vec<Jogada>> = vec![];
         let peça = self.pedra(origem);
-        if peça.is_none() { return vec![vec![]];}
+        if peça.is_none() {
+            return vec![vec![]];
+        }
         let mut clone_sem_origem = self.clone();
         *clone_sem_origem.casa_mut(origem) = Casa::Vazia;
-        clone_sem_origem.calcular_capturas_recursivamente(origem, &mut stack, &mut sequencias, peça.unwrap());
+        clone_sem_origem.calcular_capturas_recursivamente(
+            origem,
+            &mut stack,
+            &mut sequencias,
+            peça.unwrap(),
+        );
         // Filtrar apenas as maiores cadeias
-        if sequencias.is_empty() { return vec![vec![]] }
+        if sequencias.is_empty() {
+            return vec![vec![]];
+        }
         let maior_cadeia = sequencias.iter().max_by_key(|x| x.len()).unwrap().len();
-        sequencias.into_iter().filter(|x| x.len() == maior_cadeia).collect()
+        sequencias
+            .into_iter()
+            .filter(|x| x.len() == maior_cadeia)
+            .collect()
         // Sem filtrar
         // sequencias
     }
 
-    fn calcular_capturas_recursivamente(&self, origem: Coord, stack: &mut Vec<Jogada>, sequencias: &mut Vec<Vec<Jogada>>, peça: Pedra) {
-        // println!("origem: {:?}", origem);
-        // println!("stack: {:?}", stack);
-        // println!("sequencias: {:?}", sequencias.len());
-        // println!("--------------------------------------------------------------------");
+    fn calcular_capturas_recursivamente(
+        &self,
+        origem: Coord,
+        stack: &mut Vec<Jogada>,
+        sequencias: &mut Vec<Vec<Jogada>>,
+        peça: Pedra,
+    ) {
         'a: for captura in self.capturas_imediatas(origem, peça) {
-            // println!("{:?}", captura);
-            // if !stack.is_empty() && stack.last().unwrap().origem() == captura.destino() {
-            //     continue;
-            // }
-            // if stack.contains(&captura) { continue; }
             for captura_anterior in stack.iter() {
                 if captura_anterior.captura() == captura.captura() {
                     continue 'a;
                 }
             }
             stack.push(captura);
-            // println!("{:?}", stack);
             self.calcular_capturas_recursivamente(captura.destino(), stack, sequencias, peça)
         }
         if !stack.is_empty() {
             sequencias.push(stack.clone());
         }
         stack.pop();
-        // println!("{:?}", stack);
     }
 
     fn capturas_imediatas(&self, origem: Coord, peça: Pedra) -> Vec<Jogada> {
@@ -272,7 +279,9 @@ impl Partida {
         let mut capturas = vec![];
         for vizinho in origem.diagonais_de_captura() {
             if let Casa::Ocupada(peça) = self.casa(vizinho) {
-                if self.é_a_vez_de(peça) { continue; }
+                if self.é_a_vez_de(peça) {
+                    continue;
+                }
                 let destino = vizinho + origem.distancia(vizinho);
                 if self.casa(destino).é_vazia() {
                     capturas.push(Jogada::Capturar(origem, vizinho, destino));
@@ -365,7 +374,7 @@ impl Partida {
                     // encontrou uma peça do inimigo, logo, o jogo não acabou
                     return false;
                 }
-            } 
+            }
         }
         true
     }
@@ -390,8 +399,10 @@ impl Partida {
                     Pedra::DamaPreta => damas_preta += 1,
                     _ => return false,
                 }
-                if damas_branca > 1 || damas_preta > 1 { return false; }
-            } 
+                if damas_branca > 1 || damas_preta > 1 {
+                    return false;
+                }
+            }
         }
         true
     }
@@ -403,9 +414,14 @@ impl Partida {
             capturas.append(&mut self.calcular_capturas(peça));
         }
         let capturas = capturas.into_iter().filter(|x| !x.is_empty()).collect_vec();
-        if capturas.is_empty() { return vec![] }
+        if capturas.is_empty() {
+            return vec![];
+        }
         let maior_len = capturas.iter().max_by_key(|x| x.len()).unwrap().len();
-        capturas.into_iter().filter(|x| x.len() == maior_len).collect()
+        capturas
+            .into_iter()
+            .filter(|x| x.len() == maior_len)
+            .collect()
     }
 
     fn todos_movimentos_possiveis(&self) -> Vec<Vec<Jogada>> {
@@ -436,6 +452,4 @@ impl Partida {
     }
 }
 
-mod test {
-
-}
+mod test {}
